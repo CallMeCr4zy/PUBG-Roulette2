@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PUBG Roulette</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-image: url('https://i.imgur.com/qBbXFtz.png'); /* Hier dein Imgur-Link einfügen */
+      background-size: cover;
+      background-position: center;
+      color: white;
+      text-shadow: 1px 1px 2px black;
+      padding: 20px;
+    }
+    .container {
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 600px;
+      margin: auto;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    select {
+      width: 100%;
+      padding: 5px;
+      border-radius: 5px;
+      margin-top: 5px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #f39c12;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>PUBG Roulette</h1>
+
+    <!-- Map Dropdown -->
+    <label for="map">Select Map:</label>
+    <select id="map">
+      <option value="Erangel">Erangel</option>
+      <option value="Miramar">Miramar</option>
+      <option value="Taego">Taego</option>
+      <option value="Vikendi">Vikendi</option>
+      <option value="Deston">Deston</option>
+      <option value="Rondo">Rondo</option>
+      <option value="Sanhok">Sanhok</option>
+      <option value="Paramo">Paramo</option>
+      <option value="Karakin">Karakin</option>
+    </select>
+
+    <!-- Categories -->
+    <label for="category">Select Category:</label>
+    <select id="category">
+      <option value="Landing Zone">Landing Zone</option>
+      <option value="Loot Spots">Loot Spots</option>
+      <option value="Weapons">Weapons</option>
+      <option value="Vehicles">Vehicles</option>
+      <option value="Armor/Backpack">Armor/Backpack</option>
+      <option value="Special">Special</option>
+    </select>
+
+    <button onclick="generateRoulette()">Spin the Wheel</button>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    function generateRoulette() {
+      const map = document.getElementById('map').value;
+      const category = document.getElementById('category').value;
+      let resultText = '';
+
+      if (category === 'Landing Zone') {
+        resultText = getLandingZone(map);
+      } else if (category === 'Loot Spots') {
+        resultText = randomFromArray([
+          'Outside of cities', 'Inside cities', 'Single-story houses', 'Two-story houses',
+          'Free choice', 'Only loot from bathrooms', 'Only loot from kitchens',
+          'Only buildings with red roofs', 'Only flat roof buildings',
+          'Shacks (small huts)', 'Halls'
+        ]);
+      } else if (category === 'Weapons') {
+        resultText = randomFromArray([
+          'AR', 'DMR', 'MP', 'SR', 'Shotgun', 'Pistol', 'LMG',
+          'AR + MP', 'AR + SR', 'DMR + MP', 'DMR + SR', 
+          'AR + Pistol', 'DMR + Pistol', 'MP + Pistol',
+          'AR + MP + Pistol', 'DMR + MP + Pistol', 'Free choice'
+        ]);
+      } else if (category === 'Vehicles') {
+        resultText = randomFromArray([
+          'On foot always', 'Bicycle', 'Free choice', 'Boat only', 
+          'UAZ', 'Dacia', 'Motorcycle', 'Dirt bike'
+        ]);
+      } else if (category === 'Armor/Backpack') {
+        resultText = randomFromArray([
+          'Helmet 1 + Vest 1 + Backpack 1', 
+          'Helmet 2 + Vest 2 + Backpack 2', 
+          'Helmet 3 + Vest 3 + Backpack 3', 
+          'Helmet only', 'Vest only', 'Backpack only',
+          'Helmet 1 + Vest 2', 'Vest 1 + Backpack 3', 
+          'Helmet 2 + Backpack 1', 'Free choice'
+        ]);
+      } else if (category === 'Special') {
+        resultText = getSpecial();
+      }
+
+      document.getElementById('result').innerText = `${category}: ${resultText}`;
+    }
+
+    function getLandingZone(map) {
+      let lettersTop, lettersSide;
+      switch (map) {
+        case 'Erangel':
+        case 'Miramar':
+        case 'Taego':
+        case 'Deston':
+        case 'Rondo':
+        case 'Vikendi':
+          lettersTop = 'A B C D E F G H'.split(' ');
+          lettersSide = 'I J K L M N O P'.split(' ');
+          break;
+        case 'Sanhok':
+          lettersTop = 'A B C D'.split(' ');
+          lettersSide = 'I J K L'.split(' ');
+          break;
+        case 'Paramo':
+          lettersTop = 'A B C'.split(' ');
+          lettersSide = 'I J K'.split(' ');
+          break;
+        case 'Karakin':
+          lettersTop = 'A B'.split(' ');
+          lettersSide = 'I J'.split(' ');
+          break;
+        default:
+          return 'Free choice';
+      }
+      const top = randomFromArray(lettersTop);
+      const side = randomFromArray(lettersSide);
+      return `${top}${side}`;
+    }
+
+    function getSpecial() {
+      const specials = [
+        { text: 'Free choice', weight: 81 },
+        { text: 'No HUD', weight: 1 },
+        { text: 'First-Person Only', weight: 1 },
+        { text: 'Melee First Kill', weight: 1 },
+        { text: 'No Helmet First 5 Minutes', weight: 1 },
+        { text: 'No Vest First 5 Minutes', weight: 1 },
+        { text: 'No Scope Challenge', weight: 1 },
+        { text: 'Vehicles Only for Kills', weight: 1 },
+        { text: 'Grenadier Start', weight: 1 },
+        { text: 'Silent Killer', weight: 1 },
+        { text: 'No Healing Items', weight: 1 },
+        { text: 'Only One Magazine', weight: 1 },
+        { text: 'No Throwables', weight: 1 },
+        { text: 'Always On The Move', weight: 1 },
+        { text: 'No Boosters', weight: 1 },
+        { text: 'No Recoil Attachments', weight: 1 },
+        { text: 'Backpack Level 1 Max', weight: 1 },
+        { text: 'No Map Use', weight: 1 },
+        { text: 'Random Emote After Kill', weight: 1 },
+        { text: 'Swim Across Water Once', weight: 1 }
+      ];
+
+      const totalWeight = specials.reduce((acc, item) => acc + item.weight, 0);
+      let rand = Math.floor(Math.random() * totalWeight);
+
+      for (let item of specials) {
+        if (rand < item.weight) {
+          return item.text;
+        }
+        rand -= item.weight;
+      }
+      return 'Free choice';
+    }
+
+    function randomFromArray(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+  </script>
+</body>
+</html>
